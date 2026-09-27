@@ -22,7 +22,7 @@ its own `AGENTS.md`, `bun.lock` and checks) and `cli/` (`create-nexst-monorepo`)
 
 - A template change is done when `cd template && bun run lint:ts && bun run lint &&
   bun run fmt:check && bun run unused && bun run test:unit` pass **and**
-  `bun run test:matrix` passes (every feature combination generates, typechecks,
+  `bun run test:matrix` (from the repo root) passes (every feature combination generates, typechecks,
   lints, formats, passes knip and unit tests, and has no leftover markers/tokens).
 - New feature-only files go into `features.ts`; new feature-only deps into its
   `packages` edits. A leftover import or dep shows up in the matrix as a TS/knip error.
