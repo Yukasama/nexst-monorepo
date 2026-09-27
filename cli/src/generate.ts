@@ -46,7 +46,10 @@ export function toTitle(name: string): string {
  * Replaces the template's placeholder tokens: `nexst` (slug), `nexst_` (SQL-safe
  * slug), `Nexst` (display name), `your-org`, `example.com`.
  */
-export function replaceTokens(text: string, options: Pick<GenerateOptions, "domain" | "name" | "owner">) {
+export function replaceTokens(
+  text: string,
+  options: Pick<GenerateOptions, "domain" | "name" | "owner">,
+) {
   const snake = options.name.replaceAll("-", "_");
   return text
     .replaceAll("create-nexst-monorepo", "\u0000CLI\u0000")

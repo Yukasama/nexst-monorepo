@@ -19,10 +19,17 @@ function combinations(): Record<FeatureName, boolean>[] {
   const only = process.argv[2];
   if (only !== undefined) {
     const on = new Set(only.split(",").filter(Boolean));
-    return [Object.fromEntries(FEATURE_NAMES.map((f) => [f, on.has(f)])) as Record<FeatureName, boolean>];
+    return [
+      Object.fromEntries(FEATURE_NAMES.map((f) => [f, on.has(f)])) as Record<FeatureName, boolean>,
+    ];
   }
-  return Array.from({ length: 2 ** FEATURE_NAMES.length }, (_, mask) =>
-    Object.fromEntries(FEATURE_NAMES.map((f, i) => [f, Boolean(mask & (1 << i))])) as Record<FeatureName, boolean>,
+  return Array.from(
+    { length: 2 ** FEATURE_NAMES.length },
+    (_, mask) =>
+      Object.fromEntries(FEATURE_NAMES.map((f, i) => [f, Boolean(mask & (1 << i))])) as Record<
+        FeatureName,
+        boolean
+      >,
   );
 }
 
@@ -42,7 +49,14 @@ for (const features of combinations()) {
   console.log(`\n▶ ${label}`);
   const root = await mkdtemp(path.join(os.tmpdir(), "nexst-matrix-"));
   const targetDir = path.join(root, "matrix-app");
-  await generate({ domain: "matrix.dev", features, name: "matrix-app", owner: "acme", targetDir, templateDir });
+  await generate({
+    domain: "matrix.dev",
+    features,
+    name: "matrix-app",
+    owner: "acme",
+    targetDir,
+    templateDir,
+  });
 
   const ok = [
     "bun install",

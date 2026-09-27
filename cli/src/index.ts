@@ -1,9 +1,9 @@
 #!/usr/bin/env node
-import { spawnSync } from "node:child_process";
-import { existsSync } from "node:fs";
+import { spawn } from "node:child_process";
+import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { parseArgs } from "node:util";
+import { parseArgs, styleText } from "node:util";
 import * as p from "@clack/prompts";
 import { FEATURE_NAMES, FEATURES, type FeatureName } from "./features.js";
 import { generate, NAME_PATTERN } from "./generate.js";
@@ -36,9 +36,62 @@ function resolveTemplateDir(): string {
   return found;
 }
 
-function run(command: string, args: string[], cwd: string): boolean {
-  const result = spawnSync(command, args, { cwd, stdio: "inherit" });
-  return result.status === 0;
+const BANNER = [
+  "                      _   ",
+  " _ __   _____  _____| |_ ",
+  "| '_ \\ / _ \\ \\/ / __| __|",
+  "| | | |  __/>  <\\__ \\ |_ ",
+  "|_| |_|\\___/_/\\_\\___/\\__|",
+];
+const BANNER_COLORS = ["cyan", "cyan", "blue", "blue", "magenta"] as const;
+
+function printBanner(version: string): void {
+  const lines = BANNER.map((line, index) => styleText(["bold", BANNER_COLORS[index]], line));
+  console.log(`\n${lines.join("\n")}\n`);
+  console.log(styleText("dim", `  Next.js + NestJS monorepo · v${version}\n`));
+}
+
+function readVersion(): string {
+  const here = path.dirname(fileURLToPath(import.meta.url));
+  const pkg = JSON.parse(readFileSync(path.resolve(here, "../package.json"), "utf8")) as {
+    version: string;
+  };
+  return pkg.version;
+}
+
+type Command = [command: string, args: string[], cwd: string];
+
+// Runs asynchronously (so the spinner keeps animating) and captures output for failures.
+function run([command, args, cwd]: Command): Promise<{ ok: boolean; output: string }> {
+  return new Promise((resolve) => {
+    let output = "";
+    const child = spawn(command, args, { cwd, stdio: ["ignore", "pipe", "pipe"] });
+    child.stdout.on("data", (chunk: Buffer) => (output += chunk.toString()));
+    child.stderr.on("data", (chunk: Buffer) => (output += chunk.toString()));
+    child.on("error", (error) => resolve({ ok: false, output: error.message }));
+    child.on("close", (code) => resolve({ ok: code === 0, output }));
+  });
+}
+
+function elapsed(start: number): string {
+  return styleText("dim", `(${((performance.now() - start) / 1000).toFixed(1)}s)`);
+}
+
+async function step(title: string, done: string, commands: Command[]): Promise<boolean> {
+  const spinner = p.spinner();
+  const start = performance.now();
+  spinner.start(title);
+  for (const command of commands) {
+    const { ok, output } = await run(command);
+    if (!ok) {
+      spinner.error(`${title} failed: ${command[0]} ${command[1].join(" ")}`);
+      const tail = output.trim().split("\n").slice(-20).join("\n");
+      if (tail) p.log.message(styleText("dim", tail));
+      return false;
+    }
+  }
+  spinner.stop(`${done} ${elapsed(start)}`);
+  return true;
 }
 
 function cancelled(): never {
@@ -70,11 +123,13 @@ async function main(): Promise<void> {
   }
 
   const interactive = !values.yes && process.stdin.isTTY;
-  p.intro("create-nexst-monorepo");
+  printBanner(readVersion());
+  p.intro(styleText(["bgCyan", "black"], " create-nexst-monorepo "));
 
   let directory = positionals[0];
   if (!directory) {
-    if (!interactive) throw new Error("Pass a project directory, e.g. `create-nexst-monorepo my-app`");
+    if (!interactive)
+      throw new Error("Pass a project directory, e.g. `create-nexst-monorepo my-app`");
     const answer = await p.text({
       message: "Project name",
       placeholder: "my-app",
@@ -127,7 +182,9 @@ async function main(): Promise<void> {
     domain = answer;
   }
 
+  const relativeDir = path.relative(process.cwd(), targetDir) || ".";
   const spinner = p.spinner();
+  const start = performance.now();
   spinner.start(`Creating ${name}`);
   await generate({
     domain: domain ?? "example.com",
@@ -137,38 +194,49 @@ async function main(): Promise<void> {
     targetDir,
     templateDir: resolveTemplateDir(),
   });
-  spinner.stop(`Created ${path.relative(process.cwd(), targetDir) || "."}`);
+  spinner.stop(`Created ${relativeDir} ${elapsed(start)}`);
 
+  let installed = false;
   if (values.install) {
-    p.log.step("Installing dependencies");
-    const ok =
-      run("bun", ["install"], targetDir) &&
-      run("bunx", ["--bun", "prisma", "generate"], path.join(targetDir, "apps/api")) &&
-      run("bun", ["run", "fmt"], targetDir);
-    if (!ok) p.log.warn("Setup did not finish; run `bun install` and `bun run fmt` yourself.");
+    installed =
+      (await step("Installing dependencies", "Installed dependencies", [
+        ["bun", ["install"], targetDir],
+      ])) &&
+      (await step("Generating Prisma client", "Generated Prisma client", [
+        ["bunx", ["--bun", "prisma", "generate"], path.join(targetDir, "apps/api")],
+      ])) &&
+      (await step("Formatting", "Formatted", [["bun", ["run", "fmt"], targetDir]]));
+    if (!installed)
+      p.log.warn("Setup did not finish; run `bun install` and `bun run fmt` yourself.");
   }
 
   if (values.git) {
-    const ok =
-      run("git", ["init", "-q", "-b", "main"], targetDir) &&
-      run("git", ["add", "-A"], targetDir) &&
-      run("git", ["commit", "-q", "-m", "chore: scaffold with create-nexst-monorepo"], targetDir);
+    const ok = await step("Initializing git repository", "Initialized git repository", [
+      ["git", ["init", "-q", "-b", "main"], targetDir],
+      ["git", ["add", "-A"], targetDir],
+      ["git", ["commit", "-q", "-m", "chore: scaffold with create-nexst-monorepo"], targetDir],
+    ]);
     if (!ok) p.log.warn("Git setup skipped (git missing or no identity configured).");
   }
 
-  const enabled = FEATURE_NAMES.filter((feature) => features[feature]).map(
-    (feature) => FEATURES[feature].label,
+  const featureLines = FEATURE_NAMES.map((feature) =>
+    features[feature]
+      ? `${styleText("green", "✔")} ${FEATURES[feature].label}`
+      : styleText("dim", `✖ ${FEATURES[feature].label}`),
   );
+  p.note(featureLines.join("\n"), "Features");
   p.note(
     [
-      `cd ${path.relative(process.cwd(), targetDir) || "."}`,
-      ...(values.install ? [] : ["bun install"]),
+      `cd ${relativeDir}`,
+      ...(installed ? [] : ["bun install"]),
       "(cd apps/api && bunx --bun prisma migrate deploy)",
       "bun dev",
-    ].join("\n"),
-    `Features: ${enabled.length > 0 ? enabled.join(", ") : "none"}`,
+    ]
+      .map((line) => styleText("cyan", line))
+      .join("\n"),
+    "Next steps",
   );
-  p.outro("Done.");
+  p.outro(`${styleText(["bold", "magenta"], "Happy building!")} 🚀`);
 }
 
 main().catch((error: unknown) => {

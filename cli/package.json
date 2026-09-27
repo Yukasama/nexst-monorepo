@@ -2,9 +2,15 @@
   "name": "create-nexst-monorepo",
   "version": "0.1.0",
   "description": "Scaffold a Next.js + NestJS monorepo with bun, turbo, oxlint, vitest, Prisma, Docker, kustomize and CI",
-  "keywords": ["create", "monorepo", "nextjs", "nestjs", "bun", "template"],
+  "keywords": [
+    "bun",
+    "create",
+    "monorepo",
+    "nestjs",
+    "nextjs",
+    "template"
+  ],
   "license": "MIT",
-  "type": "module",
   "bin": {
     "create-nexst-monorepo": "dist/index.js"
   },
@@ -12,9 +18,7 @@
     "dist",
     "template"
   ],
-  "engines": {
-    "node": ">=22.4"
-  },
+  "type": "module",
   "scripts": {
     "build": "bun build src/index.ts --target=node --outfile dist/index.js",
     "prepack": "bun run build && bun scripts/pack-template.ts",
@@ -33,5 +37,8 @@
     "oxlint": "^1.85.0",
     "typescript": "^7.0.2",
     "vitest": "^5.0.2"
+  },
+  "engines": {
+    "node": ">=22.4"
   }
 }

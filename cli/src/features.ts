@@ -32,7 +32,8 @@ const WEB_MESSAGES = ["apps/web/messages/en.json", "apps/web/messages/de.json"];
 
 export const FEATURES: Record<FeatureName, FeatureManifest> = {
   auth: {
-    description: "Better Auth (email + password, passkeys, Google, verification & reset mails) in API and web",
+    description:
+      "Better Auth (email + password, passkeys, Google, verification & reset mails) in API and web",
     jsonKeys: Object.fromEntries(
       WEB_MESSAGES.map((file) => [
         file,
@@ -51,12 +52,23 @@ export const FEATURES: Record<FeatureName, FeatureManifest> = {
     label: "Auth",
     packages: {
       "apps/api/package.json": {
-        dependencies: ["@better-auth/passkey", "@thallesp/nestjs-better-auth", "better-auth", "nodemailer", "resend"],
+        dependencies: [
+          "@better-auth/passkey",
+          "@thallesp/nestjs-better-auth",
+          "better-auth",
+          "nodemailer",
+          "resend",
+        ],
         devDependencies: ["@types/nodemailer"],
         scripts: ["auth:generate"],
       },
       "apps/web/package.json": {
-        dependencies: ["@better-auth/passkey", "better-auth", "@hookform/resolvers", "react-hook-form"],
+        dependencies: [
+          "@better-auth/passkey",
+          "better-auth",
+          "@hookform/resolvers",
+          "react-hook-form",
+        ],
       },
     },
     paths: [
@@ -89,7 +101,8 @@ export const FEATURES: Record<FeatureName, FeatureManifest> = {
     paths: ["apps/api/src/r2"],
   },
   ui: {
-    description: "Extra UI components (dialog, drawer, select, switch, tabs, tooltip, …) with stories",
+    description:
+      "Extra UI components (dialog, drawer, select, switch, tabs, tooltip, …) with stories",
     jsonKeys: Object.fromEntries(
       WEB_MESSAGES.map((file) => [
         file,

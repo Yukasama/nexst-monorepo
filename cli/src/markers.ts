@@ -23,9 +23,13 @@ const COMMENT_OPEN = String.raw`(?:\/\/|#|--|\{\/\*|<!--)`;
 const COMMENT_CLOSE = String.raw`(?:\*\/\}|-->)?`;
 const CONDITION = String.raw`([!\w\s&|]+?)`;
 
-const BLOCK_IF = new RegExp(String.raw`^\s*${COMMENT_OPEN}\s*@if\s+${CONDITION}\s*${COMMENT_CLOSE}\s*$`);
+const BLOCK_IF = new RegExp(
+  String.raw`^\s*${COMMENT_OPEN}\s*@if\s+${CONDITION}\s*${COMMENT_CLOSE}\s*$`,
+);
 const BLOCK_END = new RegExp(String.raw`^\s*${COMMENT_OPEN}\s*@endif\s*${COMMENT_CLOSE}\s*$`);
-const LINE_IF = new RegExp(String.raw`^(.*\S)\s+${COMMENT_OPEN}\s*@if\s+${CONDITION}\s*${COMMENT_CLOSE}\s*$`);
+const LINE_IF = new RegExp(
+  String.raw`^(.*\S)\s+${COMMENT_OPEN}\s*@if\s+${CONDITION}\s*${COMMENT_CLOSE}\s*$`,
+);
 const LEADING_COMMENT = /^(\s*)(?:\/\/|#|--) ?/;
 
 /** Evaluates a marker condition against the selected features. */

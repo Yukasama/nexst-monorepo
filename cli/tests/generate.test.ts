@@ -16,16 +16,23 @@ afterEach(async () => {
 async function scaffold(features: { auth: boolean; r2: boolean; ui: boolean; worker: boolean }) {
   root = await mkdtemp(path.join(os.tmpdir(), "nexst-test-"));
   const targetDir = path.join(root, "my-app");
-  await generate({ domain: "my.dev", features, name: "my-app", owner: "acme", targetDir, templateDir });
+  await generate({
+    domain: "my.dev",
+    features,
+    name: "my-app",
+    owner: "acme",
+    targetDir,
+    templateDir,
+  });
   return targetDir;
 }
 
 describe("replaceTokens", () => {
   it("replaces slug, SQL-safe slug, title, owner and domain", () => {
     const options = { domain: "my.dev", name: "my-app", owner: "acme" };
-    expect(replaceTokens("@nexst/api nexst_user Nexst ghcr.io/your-org api.example.com", options)).toBe(
-      "@my-app/api my_app_user My App ghcr.io/acme api.my.dev",
-    );
+    expect(
+      replaceTokens("@nexst/api nexst_user Nexst ghcr.io/your-org api.example.com", options),
+    ).toBe("@my-app/api my_app_user My App ghcr.io/acme api.my.dev");
   });
 
   it("keeps the CLI's own name", () => {
@@ -57,7 +64,9 @@ describe("generate", () => {
     expect(webPkg.dependencies["@radix-ui/react-dialog"]).toBeUndefined();
     expect(webPkg.dependencies.vaul).toBeUndefined();
 
-    const messages = JSON.parse(await readFile(path.join(dir, "apps/web/messages/en.json"), "utf8"));
+    const messages = JSON.parse(
+      await readFile(path.join(dir, "apps/web/messages/en.json"), "utf8"),
+    );
     expect(messages.Auth).toBeUndefined();
     expect(messages.Home.cta).toBeUndefined();
     expect(messages.Common.cancel).toBeUndefined();
@@ -77,7 +86,9 @@ describe("generate", () => {
     expect(appModule).toContain("AuthModule.forRootAsync");
     expect(appModule).not.toContain("@if");
     expect(existsSync(path.join(dir, "apps/web/src/components/dialog/dialog.tsx"))).toBe(true);
-    expect(existsSync(path.join(dir, "apps/web/src/features/auth/google-auth-button.tsx"))).toBe(true);
+    expect(existsSync(path.join(dir, "apps/web/src/features/auth/google-auth-button.tsx"))).toBe(
+      true,
+    );
 
     const env = await readFile(path.join(dir, "apps/api/.env.development"), "utf8");
     expect(env).toMatch(/^BETTER_AUTH_SECRET=(?!change-me).{40,}$/m);

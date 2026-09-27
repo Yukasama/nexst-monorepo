@@ -3,7 +3,7 @@
 Generator for a production-ready **Next.js + NestJS** monorepo on bun:
 
 ```bash
-npx create-nexst-monorepo my-app      # or: npm create nexst-monorepo my-app / bun create nexst-monorepo my-app
+npx create-nexst-monorepo my-app
 ```
 
 ## What every project gets
