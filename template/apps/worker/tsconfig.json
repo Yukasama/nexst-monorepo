@@ -1,0 +1,4 @@
+{
+  "extends": "@nexst/tsconfig/node.json",
+  "include": ["src/**/*.ts", "tests/**/*.ts"]
+}

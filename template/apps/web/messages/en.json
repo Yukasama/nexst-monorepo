@@ -1,0 +1,98 @@
+{
+  "Common": {
+    "a11y": {
+      "hidePassword": "Hide password",
+      "showPassword": "Show password"
+    }
+  },
+  "Header": {
+    "navigation": "Main",
+    "toggleTheme": "Toggle dark mode",
+    "dashboard": "Dashboard",
+    "signIn": "Sign in",
+    "signOut": "Sign out"
+  },
+  "Home": {
+    "title": "Ship your next idea on a solid foundation",
+    "description": "Next.js, NestJS and Prisma, wired together with linting, tests, Docker images and CI.",
+    "cta": "Get started"
+  },
+  "Dashboard": {
+    "title": "Dashboard",
+    "signedInAs": "Signed in as {email}.",
+    "unverified": "Your email address is not verified yet. Check your inbox for the confirmation link."
+  },
+  "Auth": {
+    "SignIn": {
+      "title": "Sign in",
+      "emailLabel": "Email",
+      "emailPlaceholder": "you@example.com",
+      "passwordLabel": "Password",
+      "forgotPassword": "Forgot password?",
+      "submitButton": "Sign in",
+      "noAccount": "No account yet?",
+      "signUpLink": "Create one"
+    },
+    "SignUp": {
+      "title": "Create an account",
+      "nameLabel": "Name",
+      "emailLabel": "Email",
+      "emailPlaceholder": "you@example.com",
+      "passwordLabel": "Password",
+      "confirmPasswordLabel": "Confirm password",
+      "submitButton": "Create account",
+      "haveAccount": "Already have an account?",
+      "signInLink": "Sign in"
+    },
+    "Recovery": {
+      "title": "Reset your password",
+      "description": "Enter your email and we will send you a link to choose a new password.",
+      "emailLabel": "Email",
+      "emailPlaceholder": "you@example.com",
+      "submitButton": "Send reset link",
+      "emailSent": "If an account exists for this email, a reset link is on its way.",
+      "backToSignIn": "Back to sign in"
+    },
+    "ResetPassword": {
+      "title": "Choose a new password",
+      "passwordLabel": "New password",
+      "confirmPasswordLabel": "Confirm new password",
+      "submitButton": "Save password",
+      "invalidLink": "This reset link is invalid or has expired. Request a new one."
+    },
+    "Verify": {
+      "title": "Check your inbox",
+      "description": "We sent you a link to confirm your email address.",
+      "resendButton": "Resend email",
+      "resent": "Email sent"
+    },
+    "Errors": {
+      "emailInvalid": "Enter a valid email address.",
+      "nameRequired": "Enter your name.",
+      "passwordRequired": "Enter your password.",
+      "passwordTooShort": "Use at least 8 characters.",
+      "confirmPasswordRequired": "Confirm your password.",
+      "passwordsMustMatch": "The passwords do not match.",
+      "invalidCredentials": "Invalid email or password.",
+      "emailAlreadyExists": "An account with this email already exists.",
+      "networkError": "Could not reach the server. Check your connection and try again.",
+      "defaultError": "Something went wrong. Please try again."
+    }
+  },
+  "ApiErrors": {
+    "BAD_REQUEST": "The request was invalid.",
+    "CONFLICT": "This conflicts with existing data.",
+    "EMAIL_NOT_VERIFIED": "Verify your email address first.",
+    "FORBIDDEN": "You are not allowed to do this.",
+    "INSUFFICIENT_ROLE": "Your account does not have access to this.",
+    "INTERNAL_SERVER_ERROR": "Something went wrong on our side. Please try again.",
+    "NETWORK_ERROR": "Could not reach the server. Check your connection and try again.",
+    "NOT_FOUND": "Not found.",
+    "SERVICE_UNAVAILABLE": "The service is temporarily unavailable.",
+    "TOO_MANY_REQUESTS": "Too many requests. Wait a moment and try again.",
+    "UNAUTHORIZED": "Sign in to continue.",
+    "UNPROCESSABLE_ENTITY": "This could not be processed.",
+    "VALIDATION_FAILED": "Some fields are invalid.",
+    "defaultError": "Something went wrong. Please try again."
+  }
+}

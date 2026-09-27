@@ -1,0 +1,17 @@
+labels:
+  - pairs:
+      app.kubernetes.io/name: nexst-api
+      app.kubernetes.io/part-of: nexst
+      app.kubernetes.io/managed-by: kustomize
+      app.kubernetes.io/created-by: your-org
+      app.kubernetes.io/component: api
+    includeSelectors: true
+
+resources:
+  - deployment.yaml
+  - service.yaml
+
+configMapGenerator:
+  - name: nexst-api-config
+    envs:
+      - application.properties

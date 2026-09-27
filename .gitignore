@@ -1,0 +1,13 @@
+node_modules/
+.DS_Store
+.turbo/
+*.tsbuildinfo
+coverage/
+dist/
+.next/
+.env
+.env.development
+test-results/
+playwright-report/
+# packed copy of ../template, created by `npm pack`/`npm publish`
+cli/template/

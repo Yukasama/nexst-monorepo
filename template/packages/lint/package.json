@@ -1,0 +1,13 @@
+{
+  "name": "@nexst/lint",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./knip": "./knip.ts",
+    "./oxfmt": "./oxfmt.ts",
+    "./oxlint": "./oxlint.ts"
+  },
+  "devDependencies": {
+    "oxlint": "^1.85.0"
+  }
+}

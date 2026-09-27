@@ -1,0 +1,8 @@
+# tests
+report.html
+
+# prisma
+src/generated
+
+# sealed secrets
+kustomize/sealedsecrets.pem

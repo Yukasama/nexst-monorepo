@@ -1,0 +1,148 @@
+name: Publish Images
+
+on:
+  push:
+    branches: [main]
+
+concurrency:
+  group: publish-images-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      web: ${{ steps.filter.outputs.web }}
+      api: ${{ steps.filter.outputs.api }}
+      # @if worker
+      worker: ${{ steps.filter.outputs.worker }}
+      # @endif
+    steps:
+      - uses: actions/checkout@v6
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            shared: &shared
+              - 'package.json'
+              - 'bun.lock'
+              - 'bunfig.toml'
+              - 'turbo.json'
+              - '.dockerignore'
+              - 'Dockerfile.base'
+              - 'docker-bake.hcl'
+              - 'packages/**'
+            web:
+              - *shared
+              - 'apps/web/**'
+              - '!apps/web/kustomize/**'
+            api:
+              - *shared
+              - 'apps/api/**'
+              - '!apps/api/kustomize/**'
+            # @if worker
+            worker:
+              - *shared
+              - 'apps/worker/**'
+              - '!apps/worker/kustomize/**'
+            # @endif
+
+  web:
+    needs: changes
+    if: needs.changes.outputs.web == 'true'
+    uses: ./.github/workflows/publish-app.yaml
+    with:
+      app: web
+    secrets: inherit
+
+  api:
+    needs: changes
+    if: needs.changes.outputs.api == 'true'
+    uses: ./.github/workflows/publish-app.yaml
+    with:
+      app: api
+    secrets: inherit
+
+  api-migrate:
+    needs: changes
+    if: needs.changes.outputs.api == 'true'
+    uses: ./.github/workflows/publish-app.yaml
+    with:
+      app: api-migrate
+    secrets: inherit
+  # @if worker
+
+  worker:
+    needs: changes
+    if: needs.changes.outputs.worker == 'true'
+    uses: ./.github/workflows/publish-app.yaml
+    with:
+      app: worker
+    secrets: inherit
+  # @endif
+
+  # Pins the freshly pushed sha-* tags in the prod overlays so GitOps (Flux/Argo)
+  # rolls them out.
+  rewind:
+    if: >-
+      always() &&
+      needs.changes.result == 'success' &&
+      !contains(needs.*.result, 'failure') &&
+      !contains(needs.*.result, 'cancelled') &&
+      contains(needs.*.result, 'success')
+    # @if worker
+    needs: [changes, web, api, api-migrate, worker]
+    # @endif
+    # @if !worker
+    # needs: [changes, web, api, api-migrate]
+    # @endif
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          ref: main
+
+      - name: Set up Kustomize
+        working-directory: ${{ runner.temp }}
+        run: |
+          curl -sSfL https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh | bash
+          sudo mv kustomize /usr/local/bin/
+
+      - name: Update image tags in prod overlays
+        env:
+          API_CHANGED: ${{ needs.changes.outputs.api }}
+          WEB_CHANGED: ${{ needs.changes.outputs.web }}
+          WORKER_CHANGED: ${{ needs.changes.outputs.worker }} # @if worker
+        run: |
+          TAG="sha-${GITHUB_SHA::7}"
+          REGISTRY="ghcr.io/${GITHUB_REPOSITORY_OWNER,,}"
+
+          pin() { # <app dir> <image>
+            (cd "apps/$1/kustomize/overlays/prod" && kustomize edit set image "$2=$REGISTRY/$2:$TAG")
+          }
+
+          if [ "$WEB_CHANGED" = "true" ]; then pin web nexst-web; fi
+          if [ "$API_CHANGED" = "true" ]; then
+            pin api nexst-api
+            pin api nexst-api-migrate
+          fi
+          if [ "$WORKER_CHANGED" = "true" ]; then pin worker nexst-worker; fi # @if worker
+
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add apps/*/kustomize/overlays/prod/kustomization.yaml
+          if git diff --cached --quiet; then
+            echo "No image tag changes to commit."
+            exit 0
+          fi
+          git commit -m "chore: rewind images to sha-${GITHUB_SHA::7} [skip ci]"
+          git push origin HEAD:main

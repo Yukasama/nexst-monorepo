@@ -1,0 +1,33 @@
+{
+  "name": "@nexst/worker",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "imports": {
+    "#src/*": "./src/*",
+    "#tests/*": "./tests/*"
+  },
+  "scripts": {
+    "dev": "bun --watch src/main.ts",
+    "lint": "oxlint",
+    "lint:fix": "oxlint --fix",
+    "lint:ts": "tsc --noEmit",
+    "fmt": "oxfmt",
+    "fmt:check": "oxfmt --check",
+    "unused": "knip --no-config-hints",
+    "test:unit": "vitest run",
+    "test:cov": "vitest run --coverage"
+  },
+  "dependencies": {
+    "@nexst/queues": "workspace:*",
+    "@t3-oss/env-core": "^0.13.11",
+    "bullmq": "^6.3.9",
+    "ioredis": "6.0.0",
+    "pino": "^10.3.1",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.3",
+    "pino-pretty": "^13.1.3"
+  }
+}

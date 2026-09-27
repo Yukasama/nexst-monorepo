@@ -1,0 +1,53 @@
+name: nexst
+
+configs:
+  postgres_init:
+    content: |
+      CREATE SCHEMA IF NOT EXISTS nexst_user AUTHORIZATION nexst_user;
+      ALTER ROLE nexst_user SET search_path = 'nexst_user';
+
+services:
+  postgres:
+    image: postgres:18-alpine
+    container_name: nexst_dev_postgres
+    environment:
+      POSTGRES_USER: nexst_user
+      POSTGRES_PASSWORD: test-pw
+      POSTGRES_DB: nexst_db
+      TZ: Europe/Berlin
+    ports: ["5432:5432"]
+    volumes: [nexst_dev_pgdata:/var/lib/postgresql]
+    configs:
+      [{ source: postgres_init, target: /docker-entrypoint-initdb.d/init.sql }]
+    healthcheck:
+      test: [CMD-SHELL, "pg_isready -U nexst_user -d nexst_db"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+  # @if worker
+
+  redis:
+    image: redis:8-alpine
+    container_name: nexst_dev_redis
+    command: redis-server --appendonly yes
+    ports: ["6379:6379"]
+    volumes: [nexst_dev_redis:/data]
+    healthcheck:
+      test: [CMD, redis-cli, ping]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+  # @endif
+  # @if auth
+
+  mailhog:
+    image: mailhog/mailhog:v1.0.1
+    container_name: nexst_dev_mailhog
+    ports: ["1025:1025", "8025:8025"]
+  # @endif
+
+volumes:
+  nexst_dev_pgdata:
+  # @if worker
+  nexst_dev_redis:
+  # @endif

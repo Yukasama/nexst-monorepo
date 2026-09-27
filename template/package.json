@@ -1,0 +1,47 @@
+{
+  "name": "nexst",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "docker compose up -d --wait && turbo run dev",
+    "infra:down": "docker compose down",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "lint:fix": "turbo run lint:fix",
+    "fmt": "turbo run fmt",
+    "fmt:check": "turbo run fmt:check",
+    "lint:ts": "turbo run lint:ts",
+    "unused": "turbo run unused --continue=always",
+    "test:unit": "turbo run test:unit"
+  },
+  "devDependencies": {
+    "@nexst/lint": "workspace:*",
+    "@nexst/tsconfig": "workspace:*",
+    "@vitest/coverage-v8": "^5.0.2",
+    "@vitest/ui": "^5.0.2",
+    "eslint-plugin-perfectionist": "^5.12.1",
+    "eslint-plugin-regexp": "^3.3.1",
+    "eslint-plugin-security": "^4.0.1",
+    "eslint-plugin-sonarjs": "^4.2.1",
+    "knip": "^6.38.0",
+    "oxfmt": "^0.70.0",
+    "oxlint": "^1.85.0",
+    "oxlint-tsgolint": "^7.0.2003",
+    "turbo": "2.11.4",
+    "typescript": "^7.0.2",
+    "vitest": "^5.0.2"
+  },
+  "packageManager": "bun@1.4.2",
+  "trustedDependencies": [
+    "@nestjs/core",
+    "@prisma/engines",
+    "@swc/core",
+    "esbuild",
+    "msgpackr-extract",
+    "prisma",
+    "sharp"
+  ]
+}

@@ -1,0 +1,81 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  cli:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version-file: package.json
+      - run: bun install --frozen-lockfile
+      - run: bun run lint
+      - run: bun run test
+
+  template:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: template
+    steps:
+      - uses: actions/checkout@v6
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version-file: template/package.json
+      - run: bun install --frozen-lockfile --ignore-scripts
+      - run: cd apps/api && bunx --bun prisma generate
+      - run: bunx turbo run lint:ts lint fmt:check unused --continue
+      - run: bunx turbo run test:unit --filter=!@nexst/web
+      - name: Web unit + Storybook (a11y) tests
+        run: |
+          cd apps/web
+          bunx playwright install --with-deps chromium
+          bun run test:unit
+
+  matrix:
+    needs: [cli, template]
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        features: ['', auth, r2, worker, 'auth,r2', 'auth,worker', 'r2,worker', 'auth,r2,worker']
+    steps:
+      - uses: actions/checkout@v6
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version-file: package.json
+      - run: bun install --frozen-lockfile
+      - name: Generate and verify (${{ matrix.features || 'none' }})
+        run: cd cli && bun scripts/verify-matrix.ts "${{ matrix.features }}"
+
+  publish:
+    needs: matrix
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version-file: package.json
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          registry-url: https://registry.npmjs.org
+      - run: bun install --frozen-lockfile
+      - run: cd cli && npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

@@ -1,0 +1,98 @@
+{
+  "Common": {
+    "a11y": {
+      "hidePassword": "Passwort verbergen",
+      "showPassword": "Passwort anzeigen"
+    }
+  },
+  "Header": {
+    "navigation": "Hauptnavigation",
+    "toggleTheme": "Dunkelmodus umschalten",
+    "dashboard": "Dashboard",
+    "signIn": "Anmelden",
+    "signOut": "Abmelden"
+  },
+  "Home": {
+    "title": "Deine nächste Idee auf solidem Fundament",
+    "description": "Next.js, NestJS und Prisma – verdrahtet mit Linting, Tests, Docker-Images und CI.",
+    "cta": "Loslegen"
+  },
+  "Dashboard": {
+    "title": "Dashboard",
+    "signedInAs": "Angemeldet als {email}.",
+    "unverified": "Deine E-Mail-Adresse ist noch nicht bestätigt. Sieh in deinem Postfach nach dem Bestätigungslink."
+  },
+  "Auth": {
+    "SignIn": {
+      "title": "Anmelden",
+      "emailLabel": "E-Mail",
+      "emailPlaceholder": "du@example.com",
+      "passwordLabel": "Passwort",
+      "forgotPassword": "Passwort vergessen?",
+      "submitButton": "Anmelden",
+      "noAccount": "Noch kein Konto?",
+      "signUpLink": "Jetzt erstellen"
+    },
+    "SignUp": {
+      "title": "Konto erstellen",
+      "nameLabel": "Name",
+      "emailLabel": "E-Mail",
+      "emailPlaceholder": "du@example.com",
+      "passwordLabel": "Passwort",
+      "confirmPasswordLabel": "Passwort bestätigen",
+      "submitButton": "Konto erstellen",
+      "haveAccount": "Schon ein Konto?",
+      "signInLink": "Anmelden"
+    },
+    "Recovery": {
+      "title": "Passwort zurücksetzen",
+      "description": "Gib deine E-Mail ein, wir schicken dir einen Link für ein neues Passwort.",
+      "emailLabel": "E-Mail",
+      "emailPlaceholder": "du@example.com",
+      "submitButton": "Link senden",
+      "emailSent": "Falls ein Konto mit dieser E-Mail existiert, ist der Link unterwegs.",
+      "backToSignIn": "Zurück zur Anmeldung"
+    },
+    "ResetPassword": {
+      "title": "Neues Passwort wählen",
+      "passwordLabel": "Neues Passwort",
+      "confirmPasswordLabel": "Neues Passwort bestätigen",
+      "submitButton": "Passwort speichern",
+      "invalidLink": "Dieser Link ist ungültig oder abgelaufen. Fordere einen neuen an."
+    },
+    "Verify": {
+      "title": "Sieh in dein Postfach",
+      "description": "Wir haben dir einen Link zur Bestätigung deiner E-Mail-Adresse geschickt.",
+      "resendButton": "E-Mail erneut senden",
+      "resent": "E-Mail gesendet"
+    },
+    "Errors": {
+      "emailInvalid": "Gib eine gültige E-Mail-Adresse ein.",
+      "nameRequired": "Gib deinen Namen ein.",
+      "passwordRequired": "Gib dein Passwort ein.",
+      "passwordTooShort": "Verwende mindestens 8 Zeichen.",
+      "confirmPasswordRequired": "Bestätige dein Passwort.",
+      "passwordsMustMatch": "Die Passwörter stimmen nicht überein.",
+      "invalidCredentials": "E-Mail oder Passwort ist falsch.",
+      "emailAlreadyExists": "Mit dieser E-Mail gibt es bereits ein Konto.",
+      "networkError": "Der Server ist nicht erreichbar. Prüfe deine Verbindung und versuche es erneut.",
+      "defaultError": "Etwas ist schiefgelaufen. Bitte versuche es erneut."
+    }
+  },
+  "ApiErrors": {
+    "BAD_REQUEST": "Die Anfrage war ungültig.",
+    "CONFLICT": "Das kollidiert mit vorhandenen Daten.",
+    "EMAIL_NOT_VERIFIED": "Bestätige zuerst deine E-Mail-Adresse.",
+    "FORBIDDEN": "Das darfst du nicht.",
+    "INSUFFICIENT_ROLE": "Dein Konto hat darauf keinen Zugriff.",
+    "INTERNAL_SERVER_ERROR": "Bei uns ist etwas schiefgelaufen. Bitte versuche es erneut.",
+    "NETWORK_ERROR": "Der Server ist nicht erreichbar. Prüfe deine Verbindung und versuche es erneut.",
+    "NOT_FOUND": "Nicht gefunden.",
+    "SERVICE_UNAVAILABLE": "Der Dienst ist vorübergehend nicht verfügbar.",
+    "TOO_MANY_REQUESTS": "Zu viele Anfragen. Warte kurz und versuche es erneut.",
+    "UNAUTHORIZED": "Melde dich an, um fortzufahren.",
+    "UNPROCESSABLE_ENTITY": "Das konnte nicht verarbeitet werden.",
+    "VALIDATION_FAILED": "Einige Felder sind ungültig.",
+    "defaultError": "Etwas ist schiefgelaufen. Bitte versuche es erneut."
+  }
+}

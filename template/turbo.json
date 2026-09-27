@@ -1,0 +1,50 @@
+{
+  "$schema": "https://turborepo.com/schema.json",
+  "tasks": {
+    "transit": {
+      "dependsOn": ["^transit"]
+    },
+    "dev": {
+      "cache": false,
+      "persistent": true
+    },
+    "build": {
+      "dependsOn": ["transit"],
+      "outputs": [
+        ".next/**",
+        "!.next/cache/**"
+      ]
+    },
+    "lint": {
+      "dependsOn": ["transit"],
+      "outputs": []
+    },
+    "lint:fix": {
+      "dependsOn": ["transit"],
+      "outputs": []
+    },
+    "lint:ts": {
+      "dependsOn": ["transit"],
+      "outputs": []
+    },
+    "fmt": {
+      "dependsOn": ["transit"],
+      "outputs": [],
+      "cache": false
+    },
+    "fmt:check": {
+      "dependsOn": ["transit"],
+      "outputs": []
+    },
+    "unused": {
+      "dependsOn": ["transit"],
+      "outputs": []
+    },
+    "test:unit": {
+      "dependsOn": ["transit"],
+      "outputs": [
+        "coverage/**"
+      ]
+    }
+  }
+}

@@ -1,0 +1,43 @@
+# Deny everything by default.
+**
+
+!package.json
+!bun.lock
+!turbo.json
+!bunfig.toml
+
+!apps/web/package.json
+!apps/api/package.json
+# @if worker
+!apps/worker/package.json
+# @endif
+
+!apps/web/next.config.ts
+!apps/web/postcss.config.mjs
+!apps/web/tsconfig.json
+!apps/web/tsconfig.build.json
+!apps/web/public/
+!apps/web/messages/
+!apps/web/src/
+
+!apps/api/tsconfig.json
+!apps/api/prisma.config.ts
+!apps/api/src/
+!apps/api/prisma/
+
+# @if worker
+!apps/worker/src/
+
+# @endif
+!packages/lint/package.json
+!packages/lint/oxlint.ts
+!packages/lint/oxfmt.ts
+
+!packages/tsconfig/package.json
+!packages/tsconfig/base.json
+!packages/tsconfig/node.json
+# @if worker
+
+!packages/queues/package.json
+!packages/queues/src/
+# @endif

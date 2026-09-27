@@ -1,0 +1,16 @@
+labels:
+  - pairs:
+      app.kubernetes.io/name: nexst-worker
+      app.kubernetes.io/part-of: nexst
+      app.kubernetes.io/managed-by: kustomize
+      app.kubernetes.io/created-by: your-org
+      app.kubernetes.io/component: worker
+    includeSelectors: true
+
+resources:
+  - deployment.yaml
+
+configMapGenerator:
+  - name: nexst-worker-config
+    envs:
+      - application.properties

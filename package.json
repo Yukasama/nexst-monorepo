@@ -1,0 +1,11 @@
+{
+  "name": "nexst-monorepo",
+  "private": true,
+  "workspaces": ["cli"],
+  "scripts": {
+    "test": "bun run --cwd cli test",
+    "test:matrix": "bun run --cwd cli test:matrix",
+    "lint": "bun run --cwd cli lint && bun run --cwd cli lint:ts"
+  },
+  "packageManager": "bun@1.4.2"
+}

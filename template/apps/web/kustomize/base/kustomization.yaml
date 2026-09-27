@@ -1,0 +1,17 @@
+labels:
+  - pairs:
+      app.kubernetes.io/name: nexst-web
+      app.kubernetes.io/part-of: nexst
+      app.kubernetes.io/managed-by: kustomize
+      app.kubernetes.io/created-by: your-org
+      app.kubernetes.io/component: web
+    includeSelectors: true
+
+resources:
+  - deployment.yaml
+  - service.yaml
+
+configMapGenerator:
+  - name: nexst-web-config
+    envs:
+      - application.properties

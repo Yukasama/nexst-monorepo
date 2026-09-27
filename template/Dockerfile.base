@@ -1,0 +1,9 @@
+ARG BUN_VERSION
+
+FROM dhi.io/bun:${BUN_VERSION}-alpine-dev
+ENV PATH="/root/.bun/bin:${PATH}"
+WORKDIR /app
+COPY package.json ./
+RUN --mount=type=cache,id=bun-turbo-install,sharing=locked,target=/root/.bun/install/cache \
+    bun add -g turbo@$(bun -p 'require("./package.json").devDependencies.turbo')
+COPY . .

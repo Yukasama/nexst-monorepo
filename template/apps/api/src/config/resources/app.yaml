@@ -1,0 +1,29 @@
+app:
+  title: Nexst API
+  description: The Nexst backend
+  version: "0.1.0"
+
+swagger:
+  tags: [health]
+  path: api
+# @if r2
+
+r2:
+  maxAttempts: 5
+  presignExpiresInSeconds: 3600
+  region: auto
+# @endif
+# @if auth
+
+mail:
+  from: Nexst <no-reply@example.com>
+  smtp:
+    host: localhost
+    port: 1025
+# @endif
+
+security:
+  allowedHeaders: [Content-Type, Authorization, Apollo-Require-Preflight]
+  allowedMethods: [GET, POST, PUT, PATCH, DELETE, OPTIONS]
+  allowedOrigins: [http://localhost:3000, https://example.com]
+  credentials: true
