@@ -2,8 +2,13 @@
   "Common": {
     "a11y": {
       "hidePassword": "Passwort verbergen",
-      "showPassword": "Passwort anzeigen"
-    }
+      "showPassword": "Passwort anzeigen",
+      "close": "Schließen",
+      "scrollUp": "Nach oben scrollen",
+      "scrollDown": "Nach unten scrollen",
+      "clearSearch": "Suche leeren"
+    },
+    "cancel": "Abbrechen"
   },
   "Header": {
     "navigation": "Hauptnavigation",
@@ -44,6 +49,26 @@
       "haveAccount": "Schon ein Konto?",
       "signInLink": "Anmelden"
     },
+    "Google": {
+      "continueButton": "Mit Google fortfahren"
+    },
+    "Passkey": {
+      "signIn": "Mit Passkey anmelden",
+      "signingIn": "Warte auf Passkey…",
+      "title": "Passkeys",
+      "description": "Melde dich per Fingerabdruck, Gesicht, Geräte-PIN oder Sicherheitsschlüssel statt mit Passwort an.",
+      "defaultName": "Mein Passkey",
+      "add": "Passkey hinzufügen",
+      "loading": "Passkeys werden geladen…",
+      "empty": "Noch keine Passkeys.",
+      "fallbackName": "Passkey",
+      "createdAt": "Hinzugefügt am {date}",
+      "deleteLabel": "{name} löschen",
+      "added": "Passkey hinzugefügt",
+      "addError": "Der Passkey konnte nicht hinzugefügt werden. Bitte versuche es erneut.",
+      "deleted": "Passkey gelöscht",
+      "deleteError": "Der Passkey konnte nicht gelöscht werden. Bitte versuche es erneut."
+    },
     "Recovery": {
       "title": "Passwort zurücksetzen",
       "description": "Gib deine E-Mail ein, wir schicken dir einen Link für ein neues Passwort.",
@@ -77,7 +102,8 @@
       "emailAlreadyExists": "Mit dieser E-Mail gibt es bereits ein Konto.",
       "networkError": "Der Server ist nicht erreichbar. Prüfe deine Verbindung und versuche es erneut.",
       "defaultError": "Etwas ist schiefgelaufen. Bitte versuche es erneut."
-    }
+    },
+    "divider": "oder"
   },
   "ApiErrors": {
     "BAD_REQUEST": "Die Anfrage war ungültig.",

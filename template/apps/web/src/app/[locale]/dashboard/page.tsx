@@ -1,6 +1,7 @@
 import { getTranslations } from "next-intl/server";
 import { Suspense } from "react";
 import { Alert } from "@/components/alert/alert";
+import { PasskeySettings } from "@/features/auth/passkey-settings";
 import { getSession } from "@/lib/auth";
 
 /** Example protected page: the proxy redirects here only with a session. */
@@ -13,6 +14,9 @@ export default async function DashboardPage() {
       <Suspense>
         <SessionSummary />
       </Suspense>
+      <div className="pt-6">
+        <PasskeySettings />
+      </div>
     </section>
   );
 }

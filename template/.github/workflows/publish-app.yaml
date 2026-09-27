@@ -4,7 +4,12 @@ on:
   workflow_call:
     inputs:
       app:
+        # @if worker
         description: Bake target (web, api, api-migrate, worker) — also the image suffix
+        # @endif
+        # @if !worker
+        # description: Bake target (web, api, api-migrate) — also the image suffix
+        # @endif
         required: true
         type: string
 
@@ -58,3 +63,4 @@ jobs:
         env:
           NEXT_PUBLIC_HOST_URL: ${{ vars.NEXT_PUBLIC_HOST_URL }}
           NEXT_PUBLIC_API_URL: ${{ vars.NEXT_PUBLIC_API_URL }}
+          NEXT_PUBLIC_GOOGLE_CLIENT_ID: ${{ vars.NEXT_PUBLIC_GOOGLE_CLIENT_ID }} # @if auth

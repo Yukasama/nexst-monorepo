@@ -1,5 +1,6 @@
 import { getTranslations } from "next-intl/server";
 import { buttonVariants } from "@/components/button/button-variants"; // @if auth
+import { GoogleOneTap } from "@/features/auth/google-one-tap"; // @if auth
 import { Link } from "@/i18n/navigation"; // @if auth
 
 export default async function HomePage() {
@@ -12,6 +13,7 @@ export default async function HomePage() {
       </h1>
       <p className="text-muted-foreground max-w-xl text-base md:text-lg">{t("description")}</p>
       {/* @if auth */}
+      <GoogleOneTap />
       <Link className={buttonVariants({ size: "lg" })} href="/sign-up">
         {t("cta")}
       </Link>

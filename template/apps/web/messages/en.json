@@ -2,8 +2,13 @@
   "Common": {
     "a11y": {
       "hidePassword": "Hide password",
-      "showPassword": "Show password"
-    }
+      "showPassword": "Show password",
+      "close": "Close",
+      "scrollUp": "Scroll up",
+      "scrollDown": "Scroll down",
+      "clearSearch": "Clear search"
+    },
+    "cancel": "Cancel"
   },
   "Header": {
     "navigation": "Main",
@@ -44,6 +49,26 @@
       "haveAccount": "Already have an account?",
       "signInLink": "Sign in"
     },
+    "Google": {
+      "continueButton": "Continue with Google"
+    },
+    "Passkey": {
+      "signIn": "Sign in with a passkey",
+      "signingIn": "Waiting for passkey…",
+      "title": "Passkeys",
+      "description": "Sign in with your fingerprint, face, device PIN or a security key instead of a password.",
+      "defaultName": "My passkey",
+      "add": "Add passkey",
+      "loading": "Loading passkeys…",
+      "empty": "No passkeys yet.",
+      "fallbackName": "Passkey",
+      "createdAt": "Added {date}",
+      "deleteLabel": "Delete {name}",
+      "added": "Passkey added",
+      "addError": "The passkey could not be added. Please try again.",
+      "deleted": "Passkey deleted",
+      "deleteError": "The passkey could not be deleted. Please try again."
+    },
     "Recovery": {
       "title": "Reset your password",
       "description": "Enter your email and we will send you a link to choose a new password.",
@@ -77,7 +102,8 @@
       "emailAlreadyExists": "An account with this email already exists.",
       "networkError": "Could not reach the server. Check your connection and try again.",
       "defaultError": "Something went wrong. Please try again."
-    }
+    },
+    "divider": "or"
   },
   "ApiErrors": {
     "BAD_REQUEST": "The request was invalid.",

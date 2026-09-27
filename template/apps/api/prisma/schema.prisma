@@ -23,6 +23,7 @@ model User {
 
   sessions Session[]
   accounts Account[]
+  passkeys Passkey[]
   // @endif
 
   @@map("users")
@@ -66,6 +67,27 @@ model Account {
 
   @@index([userId])
   @@map("accounts")
+  @@schema("nexst_user")
+}
+
+model Passkey {
+  id           String   @id
+  name         String?
+  publicKey    String
+  credentialID String
+  counter      Int
+  deviceType   String
+  backedUp     Boolean
+  transports   String?
+  aaguid       String?
+  createdAt    DateTime @default(now())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([credentialID])
+  @@map("passkeys")
   @@schema("nexst_user")
 }
 

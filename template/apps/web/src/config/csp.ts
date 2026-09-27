@@ -30,14 +30,22 @@ const inlineScriptHashes = [
 /** Origins the browser may call: the API (GraphQL + auth). Add CDNs/buckets here (and to img-src). */
 const connectSrc = [env.NEXT_PUBLIC_API_URL];
 
+/** Third-party origins that serve scripts, styles and iframes (widgets, embeds). */
+const thirdPartySrc: string[] = [];
+// @if auth
+// Google Identity Services (One Tap) loads its script, styles and iframe from here.
+if (env.NEXT_PUBLIC_GOOGLE_CLIENT_ID) thirdPartySrc.push("https://accounts.google.com/gsi/");
+// @endif
+
 export function generateCspHeader({ nonce }: { nonce: string }) {
   const isHttps = !isDev && env.NEXT_PUBLIC_HOST_URL.startsWith("https://");
 
   return `
     default-src 'self';
-    connect-src 'self' ${connectSrc.join(" ")} ${isDev ? "localhost:* 127.0.0.1:* ws://localhost:*" : ""};
-    script-src 'self' 'nonce-${nonce}' ${inlineScriptHashes.join(" ")} ${isDev ? "'unsafe-eval'" : ""};
-    style-src 'self' 'unsafe-inline';
+    connect-src 'self' ${[...connectSrc, ...thirdPartySrc].join(" ")} ${isDev ? "localhost:* 127.0.0.1:* ws://localhost:*" : ""};
+    script-src 'self' 'nonce-${nonce}' ${inlineScriptHashes.join(" ")} ${thirdPartySrc.join(" ")} ${isDev ? "'unsafe-eval'" : ""};
+    style-src 'self' 'unsafe-inline' ${thirdPartySrc.join(" ")};
+    frame-src 'self' ${thirdPartySrc.join(" ")};
     img-src 'self' blob: data:;
     font-src 'self';
     object-src 'none';

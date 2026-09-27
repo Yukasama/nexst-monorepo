@@ -1,14 +1,16 @@
 name: CI
 
+# Pushes to main run this through deploy.yaml, which deploys only when it passes.
 on:
-  push:
-    branches: [main]
   pull_request:
     branches: [main]
+  workflow_call:
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  # Called from deploy.yaml, github.workflow is the caller's name; a group equal
+  # to the caller's would cancel this run.
+  group: ci-${{ github.event_name }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 permissions:
   contents: read

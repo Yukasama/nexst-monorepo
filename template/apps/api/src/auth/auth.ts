@@ -1,7 +1,8 @@
 import { randomUUID } from "node:crypto";
+import { passkey } from "@better-auth/passkey";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { betterAuth } from "better-auth/minimal";
-import { customSession } from "better-auth/plugins";
+import { customSession, oneTap } from "better-auth/plugins";
 import type { Prisma, PrismaClient } from "#src/generated/prisma/client.js";
 import type { MailService } from "#src/mail/mail.service.js";
 import type { PrismaService } from "#src/prisma/prisma.service.js";
@@ -17,6 +18,16 @@ const USER_SESSION_SELECT = {
 } satisfies Prisma.UserSelect;
 
 /**
+ * Google sign-in (button, One Tap, account linking) is on only when both
+ * credentials are set, so local dev and E2E runs work without a Google client.
+ */
+const googleProvider = () => {
+  const clientId = process.env.GOOGLE_CLIENT_ID?.trim();
+  const clientSecret = process.env.GOOGLE_CLIENT_SECRET?.trim();
+  return clientId && clientSecret ? { google: { clientId, clientSecret } } : undefined;
+};
+
+/**
  * Shared better-auth configuration.
  *
  * Better Auth owns the Prisma `User`, `Session`, `Account` and `Verification`
@@ -29,14 +40,23 @@ const USER_SESSION_SELECT = {
  */
 export const buildBaseAuthOptions = (prisma: PrismaClient, allowedOrigins: string[]) => {
   const cookieDomain = process.env.COOKIE_DOMAIN?.trim();
+  const baseURL = process.env.BETTER_AUTH_URL ?? "http://localhost:3001";
+  // Passkeys are bound to the registrable domain the web app runs on (the API sits on
+  // a subdomain), so the relying party is the cookie domain, not the API host.
+  const passkeyRpId = cookieDomain ? cookieDomain.replace(/^\./, "") : new URL(baseURL).hostname;
+  const google = googleProvider();
 
   return {
+    account: {
+      // A Google sign-in with the email of an existing account links to it instead of failing.
+      accountLinking: { enabled: true, trustedProviders: ["google"] },
+    },
     advanced: {
       database: { generateId: () => randomUUID() },
       ipAddress: { ipAddressHeaders: ["cf-connecting-ip", "x-forwarded-for"] },
       ...(cookieDomain ? { crossSubDomainCookies: { domain: cookieDomain, enabled: true } } : {}),
     },
-    baseURL: process.env.BETTER_AUTH_URL ?? "http://localhost:3001",
+    baseURL,
     database: prismaAdapter(prisma, { provider: "postgresql" }),
     // E2E runs (NODE_ENV=test) skip the verification mail round-trip.
     ...(process.env.NODE_ENV === "test"
@@ -57,6 +77,8 @@ export const buildBaseAuthOptions = (prisma: PrismaClient, allowedOrigins: strin
       autoSignInAfterVerification: true,
     },
     plugins: [
+      passkey({ origin: allowedOrigins, rpID: passkeyRpId, rpName: "Nexst" }),
+      oneTap(),
       customSession(async ({ session, user }) => {
         const profile = await prisma.user.findUnique({
           select: USER_SESSION_SELECT,
@@ -66,6 +88,7 @@ export const buildBaseAuthOptions = (prisma: PrismaClient, allowedOrigins: strin
       }),
     ],
     secret: process.env.BETTER_AUTH_SECRET,
+    ...(google ? { socialProviders: google } : {}),
     trustedOrigins: allowedOrigins,
   } satisfies Parameters<typeof betterAuth>[0];
 };

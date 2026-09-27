@@ -3,7 +3,7 @@
  * project's own checks (install, prisma generate, typecheck, lint, format,
  * knip, unit tests). Slow; run before releasing a template change.
  *
- *   bun scripts/verify-matrix.ts            # all 8 combinations
+ *   bun scripts/verify-matrix.ts            # all 16 combinations
  *   bun scripts/verify-matrix.ts auth,r2    # just one (comma list of enabled features)
  */
 import { spawnSync } from "node:child_process";

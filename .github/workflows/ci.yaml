@@ -52,7 +52,24 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        features: ['', auth, r2, worker, 'auth,r2', 'auth,worker', 'r2,worker', 'auth,r2,worker']
+        # Every combination of cli/src/features.ts FEATURE_NAMES.
+        features:
+          - ''
+          - 'auth'
+          - 'r2'
+          - 'auth,r2'
+          - 'ui'
+          - 'auth,ui'
+          - 'r2,ui'
+          - 'auth,r2,ui'
+          - 'worker'
+          - 'auth,worker'
+          - 'r2,worker'
+          - 'auth,r2,worker'
+          - 'ui,worker'
+          - 'auth,ui,worker'
+          - 'r2,ui,worker'
+          - 'auth,r2,ui,worker'
     steps:
       - uses: actions/checkout@v6
       - uses: oven-sh/setup-bun@v2

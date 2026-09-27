@@ -48,6 +48,8 @@ const EnvironmentSchema = z.object({
   // @endif
   DATABASE_URL: z.url("DATABASE_URL is required"),
   // @if auth
+  GOOGLE_CLIENT_ID: z.string().min(1).optional(),
+  GOOGLE_CLIENT_SECRET: z.string().min(1).optional(),
   MAIL_SMTP_HOST: z.string().min(1).optional(),
   // @endif
   // @if r2

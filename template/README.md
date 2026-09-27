@@ -23,6 +23,12 @@ bun dev
 - API: http://localhost:3001 (GraphiQL `/graphql`, Swagger `/api`, health `/health`)
 <!-- @if auth -->
 - Mail (MailHog): http://localhost:8025
+
+Google sign-in (button + One Tap) stays hidden until it is configured: create an OAuth
+client (type "Web application") in the Google Cloud console with the redirect URI
+`http://localhost:3001/api/auth/callback/google` and the JavaScript origin
+`http://localhost:3000`, then set `GOOGLE_CLIENT_ID`/`GOOGLE_CLIENT_SECRET` in
+`apps/api/.env.development` and `NEXT_PUBLIC_GOOGLE_CLIENT_ID` in `apps/web/.env`.
 <!-- @endif -->
 
 ## Scripts (root, via turbo)
@@ -38,9 +44,10 @@ bun dev
 
 ## Deployment
 
-- Images: `docker buildx bake` (targets in `docker-bake.hcl`), pushed to ghcr.io by
-  `.github/workflows/publish.yaml`, which also pins the new tags in
-  `apps/*/kustomize/overlays/prod`.
+- Pipeline (`.github/workflows/deploy.yaml`, on every push to `main`): CI → images of
+  the changed apps via `docker buildx bake` (targets in `docker-bake.hcl`) to ghcr.io →
+  rewind, which commits the new `sha-*` tags to `apps/*/kustomize/overlays/prod` for
+  GitOps (Flux/Argo) to roll out. Nothing is built or pinned unless CI passes.
 - Secrets: `apps/api/scripts/seal-secret.sh` seals the keys listed in
   `apps/api/kustomize/secret.keys` into a SealedSecret.
 - CI secrets: `DHI_REGISTRY_USERNAME`/`DHI_REGISTRY_PASSWORD` (image builds),

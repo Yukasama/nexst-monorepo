@@ -3,13 +3,15 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Alert } from "@/components/alert/alert";
 import { Button } from "@/components/button/button";
 import { Input } from "@/components/input/input";
 import { useRouter } from "@/i18n/navigation";
-import { authClient, type AuthError } from "@/lib/auth-client";
+import { authClient, type AuthError, isGoogleEnabled } from "@/lib/auth-client";
+import { AuthDivider } from "./auth-divider";
+import { GoogleAuthButton } from "./google-auth-button";
 import { authFallbackMessage } from "./lib/auth-error";
 import { createSignUpSchema, type SignUpProps } from "./lib/validator";
 
@@ -19,6 +21,7 @@ export function SignUpForm() {
   const tErrors = useTranslations("Auth.Errors");
   const tAll = useTranslations();
   const schema = useMemo(() => createSignUpSchema(tAll), [tAll]);
+  const [googleError, setGoogleError] = useState<AuthError | null>(null);
 
   const { formState, handleSubmit, register, setValue } = useForm<SignUpProps>({
     defaultValues: { confirmPassword: "", email: "", name: "", password: "" },
@@ -44,7 +47,9 @@ export function SignUpForm() {
     ? error.code === "USER_ALREADY_EXISTS" || error.code === "USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL"
       ? tErrors("emailAlreadyExists")
       : authFallbackMessage(error, tErrors)
-    : null;
+    : googleError
+      ? authFallbackMessage(googleError, tErrors)
+      : null;
 
   return (
     <div className="w-full">
@@ -91,6 +96,12 @@ export function SignUpForm() {
           {t("submitButton")}
         </Button>
       </form>
+      {isGoogleEnabled ? (
+        <>
+          <AuthDivider />
+          <GoogleAuthButton disabled={isPending} onError={setGoogleError} />
+        </>
+      ) : null}
     </div>
   );
 }

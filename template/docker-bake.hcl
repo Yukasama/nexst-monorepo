@@ -9,6 +9,12 @@ variable "NEXT_PUBLIC_HOST_URL" {
 variable "NEXT_PUBLIC_API_URL" {
   default = null
 }
+# @if auth
+
+variable "NEXT_PUBLIC_GOOGLE_CLIENT_ID" {
+  default = null
+}
+# @endif
 
 group "default" {
   # @if worker
@@ -73,5 +79,8 @@ target "web" {
     BUN_VERSION          = BUN_VERSION
     NEXT_PUBLIC_HOST_URL = NEXT_PUBLIC_HOST_URL
     NEXT_PUBLIC_API_URL  = NEXT_PUBLIC_API_URL
+    # @if auth
+    NEXT_PUBLIC_GOOGLE_CLIENT_ID = NEXT_PUBLIC_GOOGLE_CLIENT_ID
+    # @endif
   }
 }

@@ -15,8 +15,9 @@ Scaffolds a Next.js + NestJS monorepo (bun, turbo, oxlint, vitest, Playwright,
 Prisma, Docker, kustomize, GitHub Actions).
 
 Options:
-  --auth / --no-auth       Better Auth with email + password (API and web)
+  --auth / --no-auth       Better Auth: email + password, passkeys, Google (API and web)
   --r2 / --no-r2           Cloudflare R2 storage service
+  --ui / --no-ui           Extra UI components (dialog, drawer, select, switch, tabs, …)
   --worker / --no-worker   BullMQ worker app + Redis
   --owner <name>           GitHub owner for ghcr.io images   (default: your-org)
   --domain <domain>        Production domain                  (default: example.com)
@@ -57,6 +58,7 @@ async function main(): Promise<void> {
       install: { default: true, type: "boolean" },
       owner: { type: "string" },
       r2: { type: "boolean" },
+      ui: { type: "boolean" },
       worker: { type: "boolean" },
       yes: { short: "y", type: "boolean" },
     },

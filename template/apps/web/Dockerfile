@@ -18,6 +18,9 @@ COPY --from=pruner /app/out/full/ .
 
 ARG NEXT_PUBLIC_HOST_URL
 ARG NEXT_PUBLIC_API_URL
+# @if auth
+ARG NEXT_PUBLIC_GOOGLE_CLIENT_ID
+# @endif
 
 RUN cd apps/web && \
     bun run build && \

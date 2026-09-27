@@ -7,7 +7,7 @@
  * `bun run test` in cli/ generates every combination and typechecks it.
  */
 
-export const FEATURE_NAMES = ["auth", "r2", "worker"] as const;
+export const FEATURE_NAMES = ["auth", "r2", "ui", "worker"] as const;
 
 export type FeatureName = (typeof FEATURE_NAMES)[number];
 
@@ -32,7 +32,7 @@ const WEB_MESSAGES = ["apps/web/messages/en.json", "apps/web/messages/de.json"];
 
 export const FEATURES: Record<FeatureName, FeatureManifest> = {
   auth: {
-    description: "Better Auth (email + password, verification & reset mails) in API and web",
+    description: "Better Auth (email + password, passkeys, Google, verification & reset mails) in API and web",
     jsonKeys: Object.fromEntries(
       WEB_MESSAGES.map((file) => [
         file,
@@ -51,12 +51,12 @@ export const FEATURES: Record<FeatureName, FeatureManifest> = {
     label: "Auth",
     packages: {
       "apps/api/package.json": {
-        dependencies: ["@thallesp/nestjs-better-auth", "better-auth", "nodemailer", "resend"],
+        dependencies: ["@better-auth/passkey", "@thallesp/nestjs-better-auth", "better-auth", "nodemailer", "resend"],
         devDependencies: ["@types/nodemailer"],
         scripts: ["auth:generate"],
       },
       "apps/web/package.json": {
-        dependencies: ["better-auth", "@hookform/resolvers", "react-hook-form"],
+        dependencies: ["@better-auth/passkey", "better-auth", "@hookform/resolvers", "react-hook-form"],
       },
     },
     paths: [
@@ -68,6 +68,7 @@ export const FEATURES: Record<FeatureName, FeatureManifest> = {
       "apps/api/tests/auth.e2e-spec.ts",
       "apps/web/src/app/[locale]/(auth)",
       "apps/web/src/app/[locale]/dashboard",
+      "apps/web/src/components/icons.tsx",
       "apps/web/src/config/routes.ts",
       "apps/web/src/features/auth",
       "apps/web/src/lib/auth-client.ts",
@@ -86,6 +87,65 @@ export const FEATURES: Record<FeatureName, FeatureManifest> = {
       },
     },
     paths: ["apps/api/src/r2"],
+  },
+  ui: {
+    description: "Extra UI components (dialog, drawer, select, switch, tabs, tooltip, …) with stories",
+    jsonKeys: Object.fromEntries(
+      WEB_MESSAGES.map((file) => [
+        file,
+        [
+          "Common.cancel",
+          "Common.a11y.clearSearch",
+          "Common.a11y.close",
+          "Common.a11y.scrollDown",
+          "Common.a11y.scrollUp",
+        ],
+      ]),
+    ),
+    label: "UI components",
+    packages: {
+      "apps/web/package.json": {
+        dependencies: [
+          "@radix-ui/react-checkbox",
+          "@radix-ui/react-dialog",
+          "@radix-ui/react-dropdown-menu",
+          "@radix-ui/react-popover",
+          "@radix-ui/react-select",
+          "@radix-ui/react-tabs",
+          "@radix-ui/react-tooltip",
+          "vaul",
+        ],
+      },
+    },
+    paths: [
+      ...[
+        "avatar",
+        "checkbox",
+        "dialog",
+        "dialog-buttons.stories.tsx",
+        "dialog-buttons.tsx",
+        "drawer",
+        "dropdown-menu",
+        "empty-state.stories.tsx",
+        "empty-state.tsx",
+        "field-group.stories.tsx",
+        "field-group.tsx",
+        "field-label.stories.tsx",
+        "field-label.tsx",
+        "input/input-otp.stories.tsx",
+        "input/input-otp.tsx",
+        "popover",
+        "responsive-dialog",
+        "searchbar",
+        "select",
+        "skeleton",
+        "switch",
+        "tabs",
+        "textarea",
+        "tooltip",
+      ].map((component) => `apps/web/src/components/${component}`),
+      "apps/web/src/lib/hooks",
+    ],
   },
   worker: {
     description: "BullMQ worker app + Redis, with shared queue contracts",

@@ -18,7 +18,10 @@ CREATE TABLE "nexst_user"."users" (
     CONSTRAINT "users_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateIndex
+CREATE UNIQUE INDEX "users_email_key" ON "nexst_user"."users"("email");
 -- @if auth
+
 -- CreateTable
 CREATE TABLE "nexst_user"."sessions" (
     "id" TEXT NOT NULL,
@@ -29,12 +32,10 @@ CREATE TABLE "nexst_user"."sessions" (
     "ipAddress" TEXT,
     "userAgent" TEXT,
     "userId" TEXT NOT NULL,
--- @endif
 
     CONSTRAINT "sessions_pkey" PRIMARY KEY ("id")
 );
 
--- @if auth
 -- CreateTable
 CREATE TABLE "nexst_user"."accounts" (
     "id" TEXT NOT NULL,
@@ -50,12 +51,10 @@ CREATE TABLE "nexst_user"."accounts" (
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "userId" TEXT NOT NULL,
--- @endif
 
     CONSTRAINT "accounts_pkey" PRIMARY KEY ("id")
 );
 
--- @if auth
 -- CreateTable
 CREATE TABLE "nexst_user"."verifications" (
     "id" TEXT NOT NULL,
@@ -64,41 +63,51 @@ CREATE TABLE "nexst_user"."verifications" (
     "expiresAt" TIMESTAMP(3) NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
--- @endif
 
     CONSTRAINT "verifications_pkey" PRIMARY KEY ("id")
 );
 
--- CreateIndex
-CREATE UNIQUE INDEX "users_email_key" ON "nexst_user"."users"("email");
+-- CreateTable
+CREATE TABLE "nexst_user"."passkeys" (
+    "id" TEXT NOT NULL,
+    "name" TEXT,
+    "publicKey" TEXT NOT NULL,
+    "credentialID" TEXT NOT NULL,
+    "counter" INTEGER NOT NULL,
+    "deviceType" TEXT NOT NULL,
+    "backedUp" BOOLEAN NOT NULL,
+    "transports" TEXT,
+    "aaguid" TEXT,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "userId" TEXT NOT NULL,
 
--- @if auth
+    CONSTRAINT "passkeys_pkey" PRIMARY KEY ("id")
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "sessions_token_key" ON "nexst_user"."sessions"("token");
--- @endif
 
--- @if auth
 -- CreateIndex
 CREATE INDEX "sessions_userId_idx" ON "nexst_user"."sessions"("userId");
--- @endif
 
--- @if auth
 -- CreateIndex
 CREATE INDEX "accounts_userId_idx" ON "nexst_user"."accounts"("userId");
--- @endif
 
--- @if auth
 -- CreateIndex
 CREATE INDEX "verifications_identifier_idx" ON "nexst_user"."verifications"("identifier");
--- @endif
 
--- @if auth
+-- CreateIndex
+CREATE INDEX "passkeys_userId_idx" ON "nexst_user"."passkeys"("userId");
+
+-- CreateIndex
+CREATE INDEX "passkeys_credentialID_idx" ON "nexst_user"."passkeys"("credentialID");
+
 -- AddForeignKey
 ALTER TABLE "nexst_user"."sessions" ADD CONSTRAINT "sessions_userId_fkey" FOREIGN KEY ("userId") REFERENCES "nexst_user"."users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
--- @endif
 
--- @if auth
 -- AddForeignKey
 ALTER TABLE "nexst_user"."accounts" ADD CONSTRAINT "accounts_userId_fkey" FOREIGN KEY ("userId") REFERENCES "nexst_user"."users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
+-- AddForeignKey
+ALTER TABLE "nexst_user"."passkeys" ADD CONSTRAINT "passkeys_userId_fkey" FOREIGN KEY ("userId") REFERENCES "nexst_user"."users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 -- @endif

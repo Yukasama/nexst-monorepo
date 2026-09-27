@@ -22,8 +22,9 @@ npx create-nexst-monorepo my-app      # or: npm create nexst-monorepo my-app / b
 
 | Flag | Adds |
 | --- | --- |
-| `--auth` | Better Auth (email + password, verification + reset mails via SMTP/MailHog in dev and Resend in prod), global `AuthGuard` with `@AllowAnonymous`/`@IsEmailVerified`/`@Roles`, `me` query; web sign-in/up, recovery, reset, verify and a protected dashboard |
+| `--auth` | Better Auth (email + password, passkeys with sign-in button and dashboard management, Google sign-in + One Tap when `GOOGLE_CLIENT_ID`/`NEXT_PUBLIC_GOOGLE_CLIENT_ID` are set, verification + reset mails via SMTP/MailHog in dev and Resend in prod), global `AuthGuard` with `@AllowAnonymous`/`@IsEmailVerified`/`@Roles`, `me` query; web sign-in/up, recovery, reset, verify and a protected dashboard |
 | `--r2` | Cloudflare R2 `R2Service` (upload, delete, presigned GET/PUT, public URLs) |
+| `--ui` | Extra UI components with stories: avatar, checkbox, dialog, drawer, dropdown menu, empty state, field group/label, OTP input, popover, responsive dialog, searchbar, select, skeleton, switch, tabs, textarea, tooltip (Radix + vaul) |
 | `--worker` | `apps/worker` (BullMQ consumer) + `packages/queues` (shared contracts) + Redis, API producer module |
 
 Without flags the CLI asks interactively; `-y` enables everything. Other options:
@@ -41,7 +42,7 @@ Without flags the CLI asks interactively; `-y` enables everything. Other options
 ```bash
 bun install
 bun run test          # CLI unit tests (marker engine + generator)
-bun run test:matrix   # generate all 8 feature combinations and run their checks (slow)
+bun run test:matrix   # generate all 16 feature combinations and run their checks (slow)
 ```
 
 Release: bump `cli/package.json` version, then `cd cli && npm publish` (prepack builds the
