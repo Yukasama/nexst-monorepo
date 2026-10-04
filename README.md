@@ -30,6 +30,11 @@ npx create-nexst-monorepo my-app
 Without flags the CLI asks interactively; `-y` enables everything. Other options:
 `--owner` (ghcr.io owner), `--domain`, `--no-install`, `--no-git`.
 
+The CLI also requires the Postgres password and, per feature, the Google OAuth client
+(`--auth`) and R2 credentials (`--r2`), and writes them into the git-ignored `.env` files.
+It prompts for them; with `-y` pass `--db-password`, `--google-client-id`,
+`--google-client-secret`, `--r2-account-id`, `--r2-access-key-id`, `--r2-secret-access-key`.
+
 ## Repository layout
 
 - `template/` — the monorepo with **all** features enabled. It is a working project:

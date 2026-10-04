@@ -5,6 +5,12 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { parseArgs, styleText } from "node:util";
 import * as p from "@clack/prompts";
+import {
+  CREDENTIALS,
+  type CredentialSpec,
+  type Credentials,
+  validateCredential,
+} from "./credentials.js";
 import { FEATURE_NAMES, FEATURES, type FeatureName } from "./features.js";
 import { generate, NAME_PATTERN } from "./generate.js";
 
@@ -25,6 +31,15 @@ Options:
   --no-git                 Skip git init and the initial commit
   -y, --yes                Accept defaults for everything not given as a flag
   -h, --help               Show this help
+
+Credentials (asked for when missing; required with -y). Secrets only go into
+the git-ignored .env files:
+  --db-password <password>        Postgres password (local dev database)
+  --google-client-id <id>         Google OAuth client ID       (with --auth)
+  --google-client-secret <secret> Google OAuth client secret   (with --auth)
+  --r2-account-id <id>            Cloudflare account ID        (with --r2)
+  --r2-access-key-id <id>         R2 access key ID             (with --r2)
+  --r2-secret-access-key <key>    R2 secret access key         (with --r2)
 `;
 
 function resolveTemplateDir(): string {
@@ -105,12 +120,18 @@ async function main(): Promise<void> {
     allowPositionals: true,
     options: {
       auth: { type: "boolean" },
+      "db-password": { type: "string" },
       domain: { type: "string" },
       git: { default: true, type: "boolean" },
+      "google-client-id": { type: "string" },
+      "google-client-secret": { type: "string" },
       help: { short: "h", type: "boolean" },
       install: { default: true, type: "boolean" },
       owner: { type: "string" },
       r2: { type: "boolean" },
+      "r2-access-key-id": { type: "string" },
+      "r2-account-id": { type: "string" },
+      "r2-secret-access-key": { type: "string" },
       ui: { type: "boolean" },
       worker: { type: "boolean" },
       yes: { short: "y", type: "boolean" },
@@ -182,11 +203,43 @@ async function main(): Promise<void> {
     domain = answer;
   }
 
+  const credentials: Credentials = {};
+  const missing: string[] = [];
+  const needed = CREDENTIALS.filter(
+    (spec: CredentialSpec) => !spec.feature || features[spec.feature],
+  );
+  if (interactive && needed.some((spec) => values[spec.flag] === undefined)) {
+    p.log.info("Secrets are only written to the git-ignored .env files.");
+  }
+  for (const spec of needed) {
+    let value = values[spec.flag];
+    if (value === undefined && interactive) {
+      const options = {
+        message: spec.label,
+        validate: (input?: string) => validateCredential(spec, input),
+      };
+      const answer = "masked" in spec ? await p.password(options) : await p.text(options);
+      if (p.isCancel(answer)) cancelled();
+      value = answer;
+    }
+    if (value === undefined) {
+      missing.push(`--${spec.flag}`);
+      continue;
+    }
+    const error = validateCredential(spec, value);
+    if (error) throw new Error(`--${spec.flag}: ${error}`);
+    credentials[spec.name] = value;
+  }
+  if (missing.length > 0) {
+    throw new Error(`Missing ${missing.join(", ")} (pass them as flags or run without -y)`);
+  }
+
   const relativeDir = path.relative(process.cwd(), targetDir) || ".";
   const spinner = p.spinner();
   const start = performance.now();
   spinner.start(`Creating ${name}`);
   await generate({
+    credentials,
     domain: domain ?? "example.com",
     features,
     name,

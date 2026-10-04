@@ -12,7 +12,7 @@ services:
     container_name: nexst_dev_postgres
     environment:
       POSTGRES_USER: nexst_user
-      POSTGRES_PASSWORD: test-pw
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env (see .env.example)}
       POSTGRES_DB: nexst_db
       TZ: Europe/Berlin
     ports: ["5432:5432"]

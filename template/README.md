@@ -9,6 +9,7 @@ Monorepo generated with `create-nexst-monorepo`:
 ## Getting started
 
 ```bash
+cp .env.example .env                                 # Postgres password for docker compose
 cp apps/api/.env.example apps/api/.env.development   # fill in secrets
 cp apps/web/.env.example apps/web/.env
 <!-- @if worker -->
@@ -28,7 +29,8 @@ Google sign-in (button + One Tap) stays hidden until it is configured: create an
 client (type "Web application") in the Google Cloud console with the redirect URI
 `http://localhost:3001/api/auth/callback/google` and the JavaScript origin
 `http://localhost:3000`, then set `GOOGLE_CLIENT_ID`/`GOOGLE_CLIENT_SECRET` in
-`apps/api/.env.development` and `NEXT_PUBLIC_GOOGLE_CLIENT_ID` in `apps/web/.env`.
+`apps/api/.env.development` and `NEXT_PUBLIC_GOOGLE_CLIENT_ID` in `apps/web/.env`
+(`create-nexst-monorepo` asks for them and fills them in).
 <!-- @endif -->
 
 ## Scripts (root, via turbo)

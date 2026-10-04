@@ -2,10 +2,13 @@ import { randomBytes } from "node:crypto";
 import { existsSync } from "node:fs";
 import { cp, mkdir, readdir, readFile, rename, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
+import type { Credentials } from "./credentials.js";
 import { FEATURE_NAMES, FEATURES, type FeatureName } from "./features.js";
 import { applyMarkers, type Features, hasMarkers } from "./markers.js";
 
 export type GenerateOptions = {
+  /** Written into the dev `.env` files; see credentials.ts. */
+  credentials?: Credentials;
   /** Registry owner for ghcr.io images, e.g. a GitHub user or org. */
   owner: string;
   /** Production domain; the web app runs on it, the API on `api.<domain>`. */
@@ -87,6 +90,7 @@ export async function generate(options: GenerateOptions): Promise<void> {
     await removeFeature(options.targetDir, feature);
   }
 
+  const r2AccountId = options.credentials?.r2AccountId;
   const allOn: Features = Object.fromEntries(FEATURE_NAMES.map((feature) => [feature, true]));
   for (const file of await walk(options.targetDir)) {
     if (BINARY.test(file) || path.basename(file) === "bun.lock") {
@@ -99,7 +103,8 @@ export async function generate(options: GenerateOptions): Promise<void> {
     const resolved = hasMarkers(original)
       ? applyMarkers(original, options.features, allOn, path.relative(options.targetDir, file))
       : original;
-    const replaced = replaceTokens(resolved, options);
+    let replaced = replaceTokens(resolved, options);
+    if (r2AccountId) replaced = replaced.replaceAll("<account-id>", r2AccountId);
     if (replaced !== original) await writeFile(file, replaced);
   }
 
@@ -141,20 +146,44 @@ function deleteKey(object: Record<string, unknown>, [head, ...rest]: string[]): 
   if (child && typeof child === "object") deleteKey(child as Record<string, unknown>, rest);
 }
 
-/** Turns every `.env.example` into the file bun loads in dev, with a fresh auth secret. */
+/**
+ * Turns every `.env.example` into the git-ignored file bun (root: docker compose)
+ * loads in dev, with a fresh auth secret and the credentials entered at init.
+ */
 async function writeEnvFiles(options: GenerateOptions): Promise<void> {
   const targets: Record<string, string> = {
+    ".": ".env",
     "apps/api": ".env.development",
     "apps/web": ".env",
     "apps/worker": ".env",
   };
+  const credentials = options.credentials ?? {};
+  const values: Record<string, string | undefined> = {
+    BETTER_AUTH_SECRET: randomBytes(32).toString("base64"),
+    GOOGLE_CLIENT_ID: credentials.googleClientId,
+    GOOGLE_CLIENT_SECRET: credentials.googleClientSecret,
+    NEXT_PUBLIC_GOOGLE_CLIENT_ID: credentials.googleClientId,
+    // Single-quoted so docker compose takes it literally (no `$` interpolation).
+    POSTGRES_PASSWORD: credentials.dbPassword && `'${credentials.dbPassword}'`,
+    R2_ACCESS_KEY_ID: credentials.r2AccessKeyId,
+    R2_SECRET_ACCESS_KEY: credentials.r2SecretAccessKey,
+  };
   for (const [dir, envFile] of Object.entries(targets)) {
     const example = path.join(options.targetDir, dir, ".env.example");
     if (!existsSync(example)) continue;
-    const content = (await readFile(example, "utf8")).replace(
-      /^BETTER_AUTH_SECRET=.*$/m,
-      `BETTER_AUTH_SECRET=${randomBytes(32).toString("base64")}`,
-    );
+    let content = await readFile(example, "utf8");
+    for (const [key, value] of Object.entries(values)) {
+      // Also uncomments optional `# KEY=` placeholders.
+      if (value)
+        content = content.replace(new RegExp(`^(?:# )?${key}=.*$`, "m"), () => `${key}=${value}`);
+    }
+    if (credentials.dbPassword) {
+      const password = encodeURIComponent(credentials.dbPassword);
+      content = content.replace(
+        /^(DATABASE_URL=\w+:\/\/[^:/@]+:)[^@]*@/m,
+        (_, prefix: string) => `${prefix}${password}@`,
+      );
+    }
     await writeFile(path.join(options.targetDir, dir, envFile), content);
   }
 }

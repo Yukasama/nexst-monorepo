@@ -16,7 +16,9 @@ its own `AGENTS.md`, `bun.lock` and checks) and `cli/` (`create-nexst-monorepo`)
   - Keep object keys/enum members inside marker blocks already sorted, so
     `oxlint --fix` (perfectionist) never reorders them across markers.
 - Placeholders replaced at generation: `nexst` (slug), `nexst_` (SQL-safe), `Nexst`
-  (title), `your-org` (ghcr owner), `example.com` (domain).
+  (title), `your-org` (ghcr owner), `example.com` (domain), `<account-id>` (R2).
+- Credentials asked for at init (`cli/src/credentials.ts`) are filled into the dev
+  `.env` files written from each `.env.example`.
 
 ## Rules
 

@@ -16,7 +16,7 @@ Bun workspace: one `package.json`, one lockfile (`bun.lock`), one CI (root
 `bun dev` starts the infra from `compose.yaml` and runs all apps in watch mode.
 The backend apps have no build step; bun runs `src/*.ts` directly, also in production.
 Secrets live in each app's `.env`/`.env.development` (see `.env.example`); bun loads
-them itself. Run TypeScript with bun (`bun <file>`, `bunx --bun prisma`), not node.
+them itself. The root `.env` holds the Postgres password for `compose.yaml`. Run TypeScript with bun (`bun <file>`, `bunx --bun prisma`), not node.
 
 ## Docker
 
